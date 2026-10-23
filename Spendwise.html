@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SpendWise - Expense Tracker</title>
+
+  <!-- Tailwind CSS (needs internet) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+  <!-- Our own CSS file -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-slate-100 text-slate-800 min-h-screen">
+
+  <!-- HEADER -->
+  <header class="max-w-7xl mx-auto px-4 pt-8 pb-4 flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-extrabold text-indigo-950">SpendWise</h1>
+    </div>
+    <p id="today" class="hidden sm:block bg-white rounded-full px-5 py-2 text-sm font-medium text-slate-500 shadow"></p>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 pb-10 grid gap-6 lg:grid-cols-4">
+
+    <!-- LEFT SIDE: year summary + all 12 months -->
+    <aside class="flex flex-col gap-6 order-last lg:order-first">
+
+      <!-- Year summary with year arrows -->
+      <div class="bg-white rounded-3xl p-6 shadow">
+        <div class="flex items-center justify-between mb-4">
+          <button onclick="changeYear(-1)" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-lg" title="Previous year">&lsaquo;</button>
+          <h2 id="yearTitle" class="text-xl font-bold">2026 summary</h2>
+          <button onclick="changeYear(1)" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-lg" title="Next year">&rsaquo;</button>
+        </div>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-slate-500">Income</span>
+            <span id="yearIncome" class="font-bold text-emerald-600">৳0</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Expense</span>
+            <span id="yearExpense" class="font-bold text-rose-500">৳0</span>
+          </div>
+          <div class="flex justify-between border-t border-slate-100 pt-3">
+            <span class="text-slate-500">Saved</span>
+            <span id="yearSaved" class="font-extrabold">৳0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- All 12 months: click one to open it -->
+      <div class="bg-white rounded-3xl p-6 shadow flex-1">
+        <h2 class="text-xl font-bold mb-4">Months</h2>
+        <div id="months" class="space-y-2"></div>
+      </div>
+    </aside>
+
+    <!-- MIDDLE: current month -->
+    <section class="lg:col-span-2 flex flex-col gap-6">
+
+      <!-- Balance card -->
+      <div class="hero-card text-white rounded-3xl p-6 shadow-lg">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p id="monthTitle" class="text-lg font-bold">Month</p>
+            <p class="text-indigo-200 text-sm">Current balance</p>
+          </div>
+          <button id="todayBtn" onclick="goToToday()"
+            class="bg-white/15 hover:bg-white/25 active:scale-95 transition rounded-full px-4 py-2 text-sm font-medium">
+            Go to this month
+          </button>
+        </div>
+        <p id="balance" class="text-4xl font-extrabold mt-2">৳0</p>
+        <div class="grid grid-cols-2 gap-4 mt-6">
+          <div class="bg-white/10 rounded-2xl p-4 hover:bg-white/20 transition">
+            <p class="text-sm text-indigo-200">Income</p>
+            <p id="income" class="text-xl font-bold text-emerald-300">৳0</p>
+          </div>
+          <div class="bg-white/10 rounded-2xl p-4 hover:bg-white/20 transition">
+            <p class="text-sm text-indigo-200">Expense</p>
+            <p id="expense" class="text-xl font-bold text-rose-300">৳0</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Three small stat cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="stat-card bg-white rounded-2xl p-5 shadow border-l-4 border-indigo-500">
+          <p class="text-sm text-slate-500">Transactions</p>
+          <p id="statCount" class="text-2xl font-extrabold mt-1">0</p>
+        </div>
+        <div class="stat-card bg-white rounded-2xl p-5 shadow border-l-4 border-rose-400">
+          <p class="text-sm text-slate-500">Biggest expense</p>
+          <p id="statBiggest" class="text-2xl font-extrabold mt-1">৳0</p>
+        </div>
+        <div class="stat-card bg-white rounded-2xl p-5 shadow border-l-4 border-emerald-400">
+          <p class="text-sm text-slate-500">Biggest income</p>
+          <p id="statBiggestIncome" class="text-2xl font-extrabold mt-1">-</p>
+        </div>
+      </div>
+
+      <!-- Transactions list -->
+      <div class="bg-white rounded-3xl p-6 shadow flex-1 min-h-[320px]">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <h2 class="text-xl font-bold">Transactions</h2>
+          <div class="flex gap-2">
+            <button id="btn-all" onclick="setFilter('all')">All</button>
+            <button id="btn-income" onclick="setFilter('income')">Income</button>
+            <button id="btn-expense" onclick="setFilter('expense')">Expense</button>
+          </div>
+        </div>
+        <ul id="list" class="divide-y divide-slate-100"></ul>
+      </div>
+    </section>
+
+    <!-- RIGHT SIDE: add form and budget -->
+    <aside class="space-y-6">
+
+      <!-- Add form -->
+      <div class="bg-white rounded-3xl p-6 shadow">
+        <h2 class="text-xl font-bold mb-4">Add transaction</h2>
+        <div class="space-y-3">
+          <input id="title" type="text" maxlength="50" placeholder="What was it for?"
+            class="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+          <input id="amount" type="number" min="0" step="0.01" placeholder="Amount (৳)"
+            class="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+          <input id="date" type="date" aria-label="Date"
+            class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+          <div class="grid grid-cols-2 gap-2">
+            <button id="typeIncome" onclick="setType('income')">Income</button>
+            <button id="typeExpense" onclick="setType('expense')">Expense</button>
+          </div>
+          <p id="error" class="text-rose-500 text-sm hidden"></p>
+          <button onclick="addTransaction()"
+            class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-95 transition text-white font-bold rounded-xl py-3">
+            Add transaction
+          </button>
+        </div>
+      </div>
+
+      <!-- Budget -->
+      <div class="bg-white rounded-3xl p-6 shadow">
+        <h2 class="text-xl font-bold mb-3">Monthly budget</h2>
+        <div class="flex gap-2">
+          <input id="budgetInput" type="number" min="0" step="0.01" placeholder="Set limit (৳)"
+            class="flex-1 min-w-0 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+          <button onclick="setBudget()" class="bg-indigo-950 hover:bg-indigo-800 transition text-white font-medium rounded-xl px-4">Set</button>
+        </div>
+        <p id="budgetError" class="text-rose-500 text-sm mt-2 hidden"></p>
+        <div class="w-full bg-slate-100 rounded-full h-3 mt-4 overflow-hidden">
+          <div id="budgetBar" class="bar-fill h-3 rounded-full bg-emerald-500" style="width:0%"></div>
+        </div>
+        <p id="budgetText" class="text-sm text-slate-500 mt-2">No budget set yet.</p>
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- Our own JavaScript file -->
+  <script src="script.js"></script>
+</body>
+</html>

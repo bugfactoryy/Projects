@@ -1,0 +1,19 @@
+/* Our own small CSS (Tailwind handles the rest) */
+body { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+/* Gradient balance card */
+.hero-card { background: linear-gradient(135deg, #1b2340 0%, #3b3f9e 100%); }
+
+/* Smooth animated bars */
+.bar-fill { transition: width 0.6s ease; }
+
+/* New transaction slides in */
+.item-in { animation: slideIn 0.3s ease; }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Small cards lift a little on hover */
+.stat-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(59, 63, 158, 0.12); }
